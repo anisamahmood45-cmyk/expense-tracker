@@ -3,262 +3,307 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Expense Tracker</title>
+  <title>SpendTrack – Expense Tracker</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      background: #060c18;
+      color: #f1f5f9;
       min-height: 100vh;
-      padding: 24px 16px 48px;
-      color: #1e293b;
+      padding: 24px 16px 60px;
     }
 
-    .container { max-width: 680px; margin: 0 auto; }
-
-    header { text-align: center; margin-bottom: 28px; padding-top: 8px; }
-    header h1 { font-size: 26px; font-weight: 800; color: #1a4e8c; }
-    header p { color: #94a3b8; font-size: 14px; margin-top: 4px; }
-
-    .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    .glow {
+      position: fixed; width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.09) 0%, transparent 70%);
+      top: -200px; left: 50%; transform: translateX(-50%); pointer-events: none;
     }
 
-    .card-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #94a3b8;
-      margin-bottom: 16px;
-    }
+    .container { max-width: 840px; margin: 0 auto; position: relative; z-index: 1; }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
+    /* Header */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
     }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+    }
+    .brand-name { font-size: 20px; font-weight: 800; color: #f1f5f9; }
+
+    .add-toggle-btn {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border: none; color: white; font-size: 13px; font-weight: 700;
+      padding: 10px 20px; border-radius: 12px; cursor: pointer;
+      font-family: inherit; box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .add-toggle-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* Stats row */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card {
+      background: rgba(13,20,38,0.9); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px; padding: 18px 20px;
+    }
+    .stat-label { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .stat-value { font-size: 22px; font-weight: 800; color: #f1f5f9; }
+    .stat-value.blue  { color: #60a5fa; }
+    .stat-value.amber { color: #fbbf24; }
+
+    /* Add form */
+    .add-form-wrap {
+      background: rgba(13,20,38,0.9); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px; padding: 24px; margin-bottom: 20px;
+      display: none;
+    }
+    .add-form-wrap.open { display: block; animation: slideDown 0.25s ease; }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+    .form-title { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; }
+
+    .form-row { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 12px; margin-bottom: 12px; }
 
     input, select {
-      width: 100%;
-      padding: 13px 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 14px;
-      color: #1e293b;
-      background: #f8fafc;
-      outline: none;
-      transition: border-color 0.2s, background 0.2s;
+      background: rgba(30,41,59,0.8); border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 12px; color: #f1f5f9; font-size: 14px; font-weight: 500;
+      padding: 12px 14px; font-family: inherit; outline: none; width: 100%;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: rgba(59,130,246,0.5); }
+    input::placeholder { color: #334155; }
+    select option { background: #1e293b; color: #f1f5f9; }
+
+    .submit-btn {
+      width: 100%; padding: 13px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white; font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* Main content grid */
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .section-card {
+      background: rgba(13,20,38,0.9); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px; padding: 22px;
     }
 
-    input:focus, select:focus {
-      border-color: #1a4e8c;
-      background: #fff;
+    .section-title {
+      font-size: 11px; font-weight: 700; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 18px;
     }
 
-    .add-btn {
-      width: 100%;
-      padding: 14px;
-      background: #1a4e8c;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+    /* Donut chart */
+    .chart-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .donut-container { position: relative; width: 160px; height: 160px; flex-shrink: 0; }
+    .donut-svg { width: 160px; height: 160px; transform: rotate(-90deg); }
+    .donut-center {
+      position: absolute; inset: 0; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+    }
+    .donut-total-label { font-size: 10px; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .donut-total-val { font-size: 15px; font-weight: 800; color: #f1f5f9; margin-top: 2px; }
+
+    .donut-empty {
+      width: 160px; height: 160px; border-radius: 50%;
+      border: 16px solid rgba(30,41,59,0.8);
+      display: flex; align-items: center; justify-content: center;
+      color: #334155; font-size: 12px; font-weight: 600;
     }
 
-    .add-btn:hover { background: #153d70; transform: translateY(-1px); }
-    .add-btn:active { transform: translateY(0); }
-
-    /* Total banner */
-    .total-banner {
-      background: linear-gradient(135deg, #1a4e8c, #2563cc);
-      color: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 20px;
+    /* Category bars */
+    .cat-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .cat-row { display: flex; flex-direction: column; gap: 4px; }
+    .cat-info { display: flex; align-items: center; justify-content: space-between; }
+    .cat-left { display: flex; align-items: center; gap: 6px; }
+    .cat-icon-sm {
+      width: 24px; height: 24px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
     }
-
-    .total-label { font-size: 12px; font-weight: 600; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
-    .total-amount { font-size: 40px; font-weight: 800; margin-top: 6px; }
-
-    /* Summary grid */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-    }
-
-    .summary-chip {
-      background: #f0f7ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 12px;
-      padding: 12px 14px;
-      text-align: center;
-    }
-
-    .chip-icon { font-size: 20px; }
-    .chip-label { font-size: 11px; color: #64748b; margin-top: 4px; font-weight: 600; }
-    .chip-amount { font-size: 15px; font-weight: 800; color: #1a4e8c; margin-top: 2px; }
+    .cat-name { font-size: 12px; font-weight: 600; color: #cbd5e1; }
+    .cat-amt  { font-size: 12px; font-weight: 700; color: #94a3b8; }
+    .cat-bar-bg { height: 5px; background: rgba(30,41,59,0.8); border-radius: 3px; overflow: hidden; }
+    .cat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); width: 0; }
 
     /* Expense list */
-    .expense-list { list-style: none; }
+    .expense-list { display: flex; flex-direction: column; gap: 8px; }
 
     .expense-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #f1f5f9;
-      animation: pop 0.25s ease;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(30,41,59,0.45); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px; padding: 12px 14px;
+      animation: fadeUp 0.25s ease;
     }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-    .expense-item:last-child { border-bottom: none; }
-
-    @keyframes pop {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .item-left  { display: flex; align-items: center; gap: 10px; }
+    .item-icon  {
+      width: 38px; height: 38px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0;
     }
-
-    .item-left { display: flex; align-items: center; gap: 14px; }
-
-    .item-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
-    .item-name  { font-weight: 700; font-size: 14px; color: #1e293b; }
-    .item-cat   { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    .item-right { display: flex; align-items: center; gap: 12px; }
-    .item-amount { font-weight: 800; font-size: 15px; color: #1e293b; }
+    .item-name  { font-size: 13px; font-weight: 700; color: #e2e8f0; }
+    .item-cat   { font-size: 11px; color: #475569; margin-top: 2px; }
+    .item-right { display: flex; align-items: center; gap: 10px; }
+    .item-amt   { font-size: 14px; font-weight: 800; color: #f1f5f9; }
 
     .del-btn {
-      width: 30px;
-      height: 30px;
-      background: #fef2f2;
-      border: none;
-      border-radius: 8px;
-      color: #dc2626;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 28px; height: 28px; border-radius: 8px;
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.15);
+      color: #ef4444; cursor: pointer; font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
       transition: background 0.2s, color 0.2s;
     }
+    .del-btn:hover { background: #ef4444; color: white; }
 
-    .del-btn:hover { background: #dc2626; color: #fff; }
-
-    .empty-msg {
-      text-align: center;
-      color: #cbd5e1;
-      padding: 32px 0;
-      font-size: 14px;
+    .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .clear-btn {
+      background: none; border: none; color: #ef4444; font-size: 11px;
+      font-weight: 700; cursor: pointer; font-family: inherit;
+      display: none; opacity: 0.7; transition: opacity 0.2s;
     }
+    .clear-btn:hover { opacity: 1; }
 
-    .empty-msg span { display: block; font-size: 36px; margin-bottom: 10px; }
+    .empty {
+      text-align: center; padding: 30px 0; color: #334155;
+      font-size: 13px; font-weight: 500;
+    }
+    .empty span { display: block; font-size: 30px; margin-bottom: 8px; }
 
-    @media (max-width: 480px) {
-      .form-grid { grid-template-columns: 1fr; }
+    @media (max-width: 640px) {
+      .main-grid  { grid-template-columns: 1fr; }
+      .form-row   { grid-template-columns: 1fr 1fr; }
+      .stats      { grid-template-columns: 1fr 1fr; }
+      .stats .stat-card:last-child { grid-column: span 2; }
+    }
+    @media (max-width: 400px) {
+      .form-row   { grid-template-columns: 1fr; }
+      .stats      { grid-template-columns: 1fr; }
+      .stats .stat-card:last-child { grid-column: span 1; }
     }
   </style>
 </head>
 <body>
+  <div class="glow"></div>
   <div class="container">
-    <header>
-      <h1>💰 Expense Tracker</h1>
-      <p>Track your daily spending — saved automatically</p>
-    </header>
 
-    <!-- Add Form -->
-    <div class="card">
-      <div class="card-title">Add Expense</div>
-      <div class="form-grid">
-        <input type="text" id="expName" placeholder="Expense name (e.g. Lunch)"/>
-        <input type="number" id="expAmount" placeholder="Amount (PKR)" min="0" step="any"/>
+    <div class="top-bar">
+      <div class="brand">
+        <div class="brand-icon">💸</div>
+        <span class="brand-name">SpendTrack</span>
       </div>
-      <select id="expCat" style="margin-bottom:12px">
-        <option value="">Select category</option>
-        <option value="Food">🍔  Food</option>
-        <option value="Transport">🚗  Transport</option>
-        <option value="Shopping">🛍️  Shopping</option>
-        <option value="Bills">💡  Bills</option>
-        <option value="Health">❤️  Health</option>
-        <option value="Entertainment">🎮  Entertainment</option>
-        <option value="Education">📚  Education</option>
-        <option value="Other">📦  Other</option>
-      </select>
-      <button class="add-btn" onclick="addExpense()">+ Add Expense</button>
+      <button class="add-toggle-btn" onclick="toggleForm()">+ Add Expense</button>
     </div>
 
-    <!-- Total -->
-    <div class="total-banner">
-      <div class="total-label">Total Spent</div>
-      <div class="total-amount" id="totalAmount">PKR 0</div>
-    </div>
-
-    <!-- Category Summary -->
-    <div class="card" id="summaryCard" style="display:none">
-      <div class="card-title">By Category</div>
-      <div class="summary-grid" id="summaryGrid"></div>
-    </div>
-
-    <!-- List -->
-    <div class="card">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>Expenses</span>
-        <button onclick="clearAll()" style="background:none;border:none;color:#dc2626;font-size:12px;cursor:pointer;font-weight:700;display:none" id="clearBtn">Clear All</button>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Spent</div>
+        <div class="stat-value blue" id="statTotal">PKR 0</div>
       </div>
-      <ul class="expense-list" id="expenseList"></ul>
+      <div class="stat-card">
+        <div class="stat-label">Expenses</div>
+        <div class="stat-value" id="statCount">0 items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Biggest</div>
+        <div class="stat-value amber" id="statBig">—</div>
+      </div>
+    </div>
+
+    <!-- Add form -->
+    <div class="add-form-wrap" id="addForm">
+      <div class="form-title">New Expense</div>
+      <div class="form-row">
+        <input type="text" id="expName" placeholder="Expense name"/>
+        <input type="number" id="expAmount" placeholder="Amount" min="0" step="any"/>
+        <select id="expCat">
+          <option value="">Category</option>
+          <option value="Food">🍔 Food</option>
+          <option value="Transport">🚗 Transport</option>
+          <option value="Shopping">🛍️ Shopping</option>
+          <option value="Bills">💡 Bills</option>
+          <option value="Health">❤️ Health</option>
+          <option value="Entertainment">🎮 Entertainment</option>
+          <option value="Education">📚 Education</option>
+          <option value="Other">📦 Other</option>
+        </select>
+      </div>
+      <button class="submit-btn" onclick="addExpense()">Add Expense</button>
+    </div>
+
+    <!-- Main grid -->
+    <div class="main-grid">
+
+      <!-- Chart + categories -->
+      <div class="section-card">
+        <div class="section-title">Spending Breakdown</div>
+        <div class="chart-wrap">
+          <div class="donut-container" id="donutWrap">
+            <div class="donut-empty" id="donutEmpty">No data yet</div>
+          </div>
+          <div class="cat-list" id="catList"></div>
+        </div>
+      </div>
+
+      <!-- Expense list -->
+      <div class="section-card">
+        <div class="list-header">
+          <div class="section-title" style="margin-bottom:0">Recent Expenses</div>
+          <button class="clear-btn" id="clearBtn" onclick="clearAll()">Clear All</button>
+        </div>
+        <div class="expense-list" id="expenseList">
+          <div class="empty"><span>📭</span>No expenses yet.<br/>Hit "+ Add Expense" to start!</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
-    const CAT_META = {
-      'Food':          { icon: '🍔', bg: '#fff7ed' },
-      'Transport':     { icon: '🚗', bg: '#eff6ff' },
-      'Shopping':      { icon: '🛍️', bg: '#fdf4ff' },
-      'Bills':         { icon: '💡', bg: '#f0fdf4' },
-      'Health':        { icon: '❤️', bg: '#fff1f2' },
-      'Entertainment': { icon: '🎮', bg: '#f0fdf4' },
-      'Education':     { icon: '📚', bg: '#fefce8' },
-      'Other':         { icon: '📦', bg: '#f8fafc' },
+    const CAT = {
+      Food:          { icon:'🍔', color:'#f59e0b', bg:'rgba(245,158,11,0.15)' },
+      Transport:     { icon:'🚗', color:'#3b82f6', bg:'rgba(59,130,246,0.15)' },
+      Shopping:      { icon:'🛍️', color:'#a855f7', bg:'rgba(168,85,247,0.15)' },
+      Bills:         { icon:'💡', color:'#10b981', bg:'rgba(16,185,129,0.15)' },
+      Health:        { icon:'❤️', color:'#ef4444', bg:'rgba(239,68,68,0.15)' },
+      Entertainment: { icon:'🎮', color:'#ec4899', bg:'rgba(236,72,153,0.15)' },
+      Education:     { icon:'📚', color:'#06b6d4', bg:'rgba(6,182,212,0.15)' },
+      Other:         { icon:'📦', color:'#64748b', bg:'rgba(100,116,139,0.15)' },
     };
 
     let expenses = JSON.parse(localStorage.getItem('anisa_expenses') || '[]');
 
-    function save() {
-      localStorage.setItem('anisa_expenses', JSON.stringify(expenses));
+    function save() { localStorage.setItem('anisa_expenses', JSON.stringify(expenses)); }
+    function fmt(n) { return 'PKR ' + Math.round(n).toLocaleString('en-PK'); }
+
+    function toggleForm() {
+      const f = document.getElementById('addForm');
+      f.classList.toggle('open');
+      if (f.classList.contains('open')) document.getElementById('expName').focus();
     }
 
     function addExpense() {
       const name   = document.getElementById('expName').value.trim();
       const amount = parseFloat(document.getElementById('expAmount').value);
       const cat    = document.getElementById('expCat').value;
-
-      if (!name)         { alert('Please enter an expense name.'); return; }
-      if (!amount || amount <= 0) { alert('Please enter a valid amount.'); return; }
-      if (!cat)          { alert('Please select a category.'); return; }
-
+      if (!name || !amount || amount <= 0 || !cat) {
+        const missing = !name ? 'expName' : !amount ? 'expAmount' : 'expCat';
+        document.getElementById(missing).focus();
+        document.getElementById(missing).style.borderColor = 'rgba(239,68,68,0.6)';
+        setTimeout(() => document.getElementById(missing).style.borderColor = '', 1500);
+        return;
+      }
       expenses.unshift({ id: Date.now(), name, amount, cat });
-      save();
-      render();
-
+      save(); render();
       document.getElementById('expName').value   = '';
       document.getElementById('expAmount').value = '';
       document.getElementById('expCat').value    = '';
@@ -267,84 +312,107 @@
 
     function deleteExpense(id) {
       expenses = expenses.filter(e => e.id !== id);
-      save();
-      render();
+      save(); render();
     }
 
     function clearAll() {
       if (!confirm('Delete all expenses?')) return;
-      expenses = [];
-      save();
-      render();
+      expenses = []; save(); render();
     }
 
-    function fmt(n) {
-      return 'PKR ' + n.toLocaleString('en-PK', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    function drawDonut(catTotals, total) {
+      const wrap = document.getElementById('donutWrap');
+      if (!total) {
+        wrap.innerHTML = '<div class="donut-empty">No data yet</div>';
+        return;
+      }
+      const R = 60, CX = 80, CY = 80, SW = 18;
+      const circumference = 2 * Math.PI * R;
+      const entries = Object.entries(catTotals).sort((a,b) => b[1]-a[1]);
+      let offset = 0;
+      const segs = entries.map(([cat, amt]) => {
+        const pct = amt / total;
+        const dash = circumference * pct;
+        const seg = `<circle cx="${CX}" cy="${CY}" r="${R}" fill="none"
+          stroke="${CAT[cat]?.color || '#64748b'}" stroke-width="${SW}"
+          stroke-dasharray="${dash} ${circumference - dash}"
+          stroke-dashoffset="${-offset * circumference}"
+          stroke-linecap="butt"/>`;
+        offset += pct;
+        return seg;
+      });
+
+      wrap.innerHTML = `
+        <svg class="donut-svg" viewBox="0 0 160 160">${segs.join('')}</svg>
+        <div class="donut-center">
+          <div class="donut-total-label">Spent</div>
+          <div class="donut-total-val">${fmt(total)}</div>
+        </div>`;
     }
 
     function render() {
-      const list      = document.getElementById('expenseList');
-      const totalEl   = document.getElementById('totalAmount');
-      const summaryEl = document.getElementById('summaryGrid');
-      const summaryCard = document.getElementById('summaryCard');
-      const clearBtn  = document.getElementById('clearBtn');
-
-      // Total
       const total = expenses.reduce((s, e) => s + e.amount, 0);
-      totalEl.textContent = fmt(total);
+      const biggest = expenses.length ? Math.max(...expenses.map(e => e.amount)) : 0;
+
+      document.getElementById('statTotal').textContent = fmt(total);
+      document.getElementById('statCount').textContent = expenses.length + (expenses.length === 1 ? ' item' : ' items');
+      document.getElementById('statBig').textContent   = biggest ? fmt(biggest) : '—';
+      document.getElementById('clearBtn').style.display = expenses.length ? 'block' : 'none';
 
       // Category totals
-      const cats = {};
-      expenses.forEach(e => { cats[e.cat] = (cats[e.cat] || 0) + e.amount; });
+      const catTotals = {};
+      expenses.forEach(e => { catTotals[e.cat] = (catTotals[e.cat] || 0) + e.amount; });
 
-      if (Object.keys(cats).length > 0) {
-        summaryCard.style.display = 'block';
-        summaryEl.innerHTML = Object.entries(cats)
-          .sort((a, b) => b[1] - a[1])
-          .map(([cat, amt]) => `
-            <div class="summary-chip">
-              <div class="chip-icon">${CAT_META[cat]?.icon || '📦'}</div>
-              <div class="chip-label">${cat}</div>
-              <div class="chip-amount">${fmt(amt)}</div>
+      // Donut
+      drawDonut(catTotals, total);
+
+      // Category bars
+      const sorted = Object.entries(catTotals).sort((a,b) => b[1]-a[1]);
+      const catList = document.getElementById('catList');
+      catList.innerHTML = sorted.length ? sorted.map(([cat, amt]) => {
+        const pct = total ? Math.round((amt / total) * 100) : 0;
+        const meta = CAT[cat] || CAT.Other;
+        return `<div class="cat-row">
+          <div class="cat-info">
+            <div class="cat-left">
+              <div class="cat-icon-sm" style="background:${meta.bg}">${meta.icon}</div>
+              <span class="cat-name">${cat}</span>
             </div>
-          `).join('');
-      } else {
-        summaryCard.style.display = 'none';
-      }
+            <span class="cat-amt">${fmt(amt)} <span style="color:#334155;font-weight:500">${pct}%</span></span>
+          </div>
+          <div class="cat-bar-bg">
+            <div class="cat-bar-fill" style="background:${meta.color};width:${pct}%"></div>
+          </div>
+        </div>`;
+      }).join('') : '';
 
-      // List
-      list.innerHTML = '';
-      clearBtn.style.display = expenses.length ? 'block' : 'none';
-
-      if (expenses.length === 0) {
-        list.innerHTML = `<div class="empty-msg"><span>📭</span>No expenses yet.<br/>Add one above to get started!</div>`;
+      // Expense list
+      const list = document.getElementById('expenseList');
+      if (!expenses.length) {
+        list.innerHTML = `<div class="empty"><span>📭</span>No expenses yet.<br/>Hit "+ Add Expense" to start!</div>`;
         return;
       }
-
-      expenses.forEach(e => {
-        const meta = CAT_META[e.cat] || CAT_META['Other'];
-        const li   = document.createElement('li');
-        li.className = 'expense-item';
-        li.innerHTML = `
+      list.innerHTML = expenses.map(e => {
+        const m = CAT[e.cat] || CAT.Other;
+        return `<div class="expense-item">
           <div class="item-left">
-            <div class="item-icon" style="background:${meta.bg}">${meta.icon}</div>
+            <div class="item-icon" style="background:${m.bg}">${m.icon}</div>
             <div>
               <div class="item-name">${e.name}</div>
               <div class="item-cat">${e.cat}</div>
             </div>
           </div>
           <div class="item-right">
-            <div class="item-amount">${fmt(e.amount)}</div>
-            <button class="del-btn" onclick="deleteExpense(${e.id})" title="Delete">✕</button>
+            <div class="item-amt">${fmt(e.amount)}</div>
+            <button class="del-btn" onclick="deleteExpense(${e.id})">✕</button>
           </div>
-        `;
-        list.appendChild(li);
-      });
+        </div>`;
+      }).join('');
     }
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && document.activeElement !== document.querySelector('.add-btn')) {
-        addExpense();
+      if (e.key === 'Enter' && document.getElementById('addForm').classList.contains('open')) {
+        if (document.activeElement !== document.querySelector('.submit-btn')) addExpense();
       }
     });
 
