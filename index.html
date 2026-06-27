@@ -23,13 +23,11 @@
 
     body { font-family:-apple-system,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-    /* BG */
     .bg-blob { position:fixed; border-radius:50%; pointer-events:none; filter:blur(100px); }
     .blob-1 { width:700px;height:700px;background:rgba(59,130,246,.07);top:-250px;left:-200px;animation:blobF 14s ease-in-out infinite; }
     .blob-2 { width:500px;height:500px;background:rgba(139,92,246,.06);bottom:-200px;right:-150px;animation:blobF 11s ease-in-out infinite reverse; }
     @keyframes blobF { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-30px)} }
 
-    /* LAYOUT */
     .app { max-width:1180px; margin:0 auto; padding:32px 24px 80px; position:relative; z-index:1; }
 
     /* TOP BAR */
@@ -37,7 +35,12 @@
     .brand  { display:flex; align-items:center; gap:12px; }
     .brand-icon { width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(59,130,246,.4); }
     .brand-name { font-size:22px;font-weight:900;letter-spacing:-.5px; }
-    .brand-sub  { font-size:11px;color:var(--muted);margin-top:1px; }
+    .month-nav { display:flex;align-items:center;gap:6px;margin-top:2px; }
+    .month-nav-btn { background:rgba(30,41,59,.8);border:1px solid var(--border);color:var(--sub);width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:inherit; }
+    .month-nav-btn:hover { border-color:rgba(59,130,246,.4);color:var(--blue); }
+    .month-nav-btn:disabled { opacity:.3;cursor:not-allowed; }
+    .month-label-text { font-size:12px;color:var(--muted);font-weight:600;min-width:120px;text-align:center; }
+    .current-month-badge { font-size:9px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue);padding:2px 7px;border-radius:10px;font-weight:700; }
     .topbar-actions { display:flex; gap:10px; align-items:center; }
     .btn-primary { background:linear-gradient(135deg,var(--blue),var(--purple));border:none;color:white;font-size:13px;font-weight:700;padding:10px 20px;border-radius:12px;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(59,130,246,.35);transition:all .2s; }
     .btn-primary:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(59,130,246,.5); }
@@ -90,6 +93,13 @@
     .cat-btn:hover { border-color:rgba(59,130,246,.4);color:var(--sub); }
     .cat-btn.selected { border-color:var(--blue);background:rgba(59,130,246,.15);color:#93c5fd; }
     .cat-emoji { display:block;font-size:18px;margin-bottom:2px; }
+
+    /* RECURRING TOGGLE */
+    .recurring-row { display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(30,41,59,.5);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s; }
+    .recurring-row:has(input:checked) { border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.08); }
+    .recurring-row input[type=checkbox] { width:16px;height:16px;accent-color:#6366f1;cursor:pointer;flex-shrink:0; }
+    .recurring-row label { font-size:13px;color:var(--sub);cursor:pointer;font-weight:500; }
+
     .submit-row { display:grid;grid-template-columns:1fr 44px;gap:8px;margin-top:4px; }
     .submit-btn { padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--purple));color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(59,130,246,.3);transition:all .2s; }
     .submit-btn:hover { transform:translateY(-1px);box-shadow:0 8px 28px rgba(59,130,246,.5); }
@@ -99,7 +109,6 @@
     /* RIGHT PANEL */
     .right-panel { display:flex;flex-direction:column;gap:20px; }
 
-    /* CHART + CATEGORIES */
     .breakdown-card { background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;backdrop-filter:blur(20px); }
     .section-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
     .section-title { font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px; }
@@ -128,6 +137,7 @@
     .month-bar-wrap { flex:1;width:100%;display:flex;align-items:flex-end; }
     .month-bar { width:100%;border-radius:6px 6px 0 0;transition:height .8s cubic-bezier(.34,1.56,.64,1);min-height:4px;background:linear-gradient(180deg,var(--blue),var(--purple));opacity:.6; }
     .month-bar.current { opacity:1;box-shadow:0 0 16px rgba(59,130,246,.5); }
+    .month-bar.viewing { opacity:.9;box-shadow:0 0 12px rgba(139,92,246,.5); }
     .month-label { font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase; }
     .month-amt   { font-size:9px;color:var(--sub);font-weight:600; }
 
@@ -136,20 +146,19 @@
     .filter-btn { background:rgba(30,41,59,.7);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit;transition:all .2s; }
     .filter-btn:hover,.filter-btn.active { background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#93c5fd; }
 
-    /* SEARCH */
     .search-wrap { position:relative;margin-bottom:16px; }
     .search-icon { position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px; }
     .search-input { width:100%;background:rgba(30,41,59,.7);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:13px;padding:11px 14px 11px 38px;font-family:inherit;outline:none;transition:border-color .2s; }
     .search-input:focus { border-color:rgba(59,130,246,.4); }
     .search-input::placeholder { color:#334155; }
 
-    /* EXPENSE LIST */
     .expense-list { display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:4px; }
     .expense-list::-webkit-scrollbar { width:4px; }
     .expense-list::-webkit-scrollbar-track { background:transparent; }
     .expense-list::-webkit-scrollbar-thumb { background:rgba(59,130,246,.3);border-radius:4px; }
     .expense-item { display:flex;align-items:center;justify-content:space-between;background:rgba(30,41,59,.45);border:1px solid var(--border);border-radius:14px;padding:14px 16px;animation:fadeUp .25s ease;transition:all .2s; }
     .expense-item:hover { border-color:rgba(59,130,246,.25);background:rgba(30,41,59,.7); }
+    .expense-item.recurring-item { border-color:rgba(99,102,241,.2); }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     .item-left  { display:flex;align-items:center;gap:12px; }
     .item-icon  { width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0; }
@@ -159,6 +168,7 @@
     .item-amt   { font-size:15px;font-weight:900; }
     .del-btn { width:30px;height:30px;border-radius:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.15);color:var(--red);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s; }
     .del-btn:hover { background:var(--red);color:white; }
+    .rec-badge { font-size:9px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.25);color:#a5b4fc;padding:2px 6px;border-radius:6px;font-weight:700; }
     .empty-state { text-align:center;padding:40px;color:var(--muted);font-size:13px; }
     .empty-state .emoji { font-size:40px;display:block;margin-bottom:12px; }
 
@@ -166,7 +176,6 @@
     .toast { position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(13,20,38,.98);border:1px solid rgba(59,130,246,.3);color:var(--text);font-size:13px;font-weight:600;padding:12px 24px;border-radius:12px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;backdrop-filter:blur(20px); }
     .toast.show { transform:translateX(-50%) translateY(0); }
 
-    /* RESPONSIVE */
     @media (max-width:900px) { .main-grid{grid-template-columns:1fr} .form-card{position:static} .hero-stats{grid-template-columns:1fr 1fr} .breakdown-inner{grid-template-columns:1fr;justify-items:center} }
     @media (max-width:520px) { .hero-stats{grid-template-columns:1fr 1fr} .cat-grid{grid-template-columns:repeat(4,1fr)} }
   </style>
@@ -176,6 +185,7 @@
 <div class="bg-blob blob-1"></div>
 <div class="bg-blob blob-2"></div>
 <div class="toast" id="toast"></div>
+<input type="file" id="csvFile" accept=".csv" style="display:none" onchange="importCSV(event)">
 
 <div class="app">
 
@@ -185,10 +195,16 @@
       <div class="brand-icon">💸</div>
       <div>
         <div class="brand-name">SpendTrack</div>
-        <div class="brand-sub" id="monthLabel">Loading...</div>
+        <div class="month-nav">
+          <button class="month-nav-btn" onclick="prevMonth()" title="Previous month">‹</button>
+          <span class="month-label-text" id="monthLabel">Loading...</span>
+          <button class="month-nav-btn" id="nextMonthBtn" onclick="nextMonth()" title="Next month" disabled>›</button>
+          <span class="current-month-badge" id="currentBadge">NOW</span>
+        </div>
       </div>
     </div>
     <div class="topbar-actions">
+      <button class="btn-ghost" onclick="document.getElementById('csvFile').click()">⬆ Import CSV</button>
       <button class="btn-ghost" onclick="exportCSV()">⬇ Export CSV</button>
       <button class="btn-primary" onclick="document.getElementById('expName').focus()">+ Add Entry</button>
     </div>
@@ -269,6 +285,14 @@
         <input class="field-input" id="expDate" type="date"/>
       </div>
 
+      <div class="form-field">
+        <label class="field-label">Options</label>
+        <div class="recurring-row" onclick="document.getElementById('isRecurring').click()">
+          <input type="checkbox" id="isRecurring" onclick="event.stopPropagation()">
+          <label for="isRecurring">🔁 Recurring every month (rent, salary, etc.)</label>
+        </div>
+      </div>
+
       <div class="submit-row">
         <button class="submit-btn" onclick="addEntry()">Add Entry</button>
         <button class="clear-all-btn" onclick="clearAll()" title="Clear all">🗑</button>
@@ -315,6 +339,7 @@
           <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
           <button class="filter-btn" onclick="setFilter('expense',this)">Expenses</button>
           <button class="filter-btn" onclick="setFilter('income',this)">Income</button>
+          <button class="filter-btn" onclick="setFilter('recurring',this)">🔁 Recurring</button>
         </div>
 
         <div class="expense-list" id="expenseList">
@@ -343,18 +368,37 @@
     Gift:          {icon:'🎁',color:'#f59e0b',bg:'rgba(245,158,11,.15)'},
   };
 
-  let entries  = JSON.parse(localStorage.getItem('st_entries') || '[]');
-  let budget   = parseInt(localStorage.getItem('st_budget') || '50000');
-  let selType  = 'expense';
-  let selCat   = 'Food';
+  let entries    = JSON.parse(localStorage.getItem('st_entries') || '[]');
+  let budget     = parseInt(localStorage.getItem('st_budget') || '50000');
+  let selType    = 'expense';
+  let selCat     = 'Food';
   let filterMode = 'all';
+  let viewOffset = 0; // 0 = current month, -1 = last month, etc.
 
   /* ── INIT ── */
   const today = new Date();
   document.getElementById('expDate').value = today.toISOString().split('T')[0];
-  document.getElementById('monthLabel').textContent = today.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  updateMonthLabel();
   buildCatGrid();
   render();
+
+  /* ── MONTH NAVIGATION ── */
+  function getViewDate(){
+    const d = new Date(today.getFullYear(), today.getMonth() + viewOffset, 1);
+    return d;
+  }
+  function getViewKey(){
+    const d = getViewDate();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  function updateMonthLabel(){
+    const d = getViewDate();
+    document.getElementById('monthLabel').textContent = d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    document.getElementById('nextMonthBtn').disabled  = viewOffset >= 0;
+    document.getElementById('currentBadge').style.display = viewOffset === 0 ? 'inline-flex' : 'none';
+  }
+  function prevMonth(){ viewOffset--; updateMonthLabel(); render(); }
+  function nextMonth(){ if(viewOffset>=0) return; viewOffset++; updateMonthLabel(); render(); }
 
   /* ── TYPE TOGGLE ── */
   function setType(t){
@@ -362,9 +406,8 @@
     document.getElementById('typeExpense').className='type-btn'+(t==='expense'?' active-expense':'');
     document.getElementById('typeIncome').className ='type-btn'+(t==='income'?' active-income':'');
     document.getElementById('catField').style.display=t==='income'?'none':'block';
-    if(t==='income') selCat='Salary';
+    if(t==='income'){ selCat='Salary'; buildCatGridIncome(); }
     else { selCat='Food'; buildCatGrid(); }
-    if(t==='income') buildCatGridIncome();
   }
 
   function buildCatGrid(){
@@ -382,7 +425,6 @@
       </button>`).join('');
     document.getElementById('catField').style.display='block';
   }
-
   function selectCat(c,el){
     selCat=c;
     document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
@@ -391,23 +433,24 @@
 
   /* ── ADD ENTRY ── */
   function addEntry(){
-    const name   = document.getElementById('expName').value.trim();
-    const amount = parseFloat(document.getElementById('expAmount').value);
-    const date   = document.getElementById('expDate').value || today.toISOString().split('T')[0];
+    const name      = document.getElementById('expName').value.trim();
+    const amount    = parseFloat(document.getElementById('expAmount').value);
+    const date      = document.getElementById('expDate').value || today.toISOString().split('T')[0];
+    const recurring = document.getElementById('isRecurring').checked;
     if(!name||!amount||amount<=0){ shake('expName'); return; }
-    entries.unshift({id:Date.now(),name,amount,cat:selCat,type:selType,date});
+    entries.unshift({id:Date.now(),name,amount,cat:selCat,type:selType,date,recurring});
     save(); render();
     document.getElementById('expName').value='';
     document.getElementById('expAmount').value='';
+    document.getElementById('isRecurring').checked=false;
     document.getElementById('expName').focus();
-    showToast(selType==='income'?'💰 Income added!':'💸 Expense added!');
+    showToast(recurring?'🔁 Recurring entry added!':(selType==='income'?'💰 Income added!':'💸 Expense added!'));
   }
 
   function shake(id){
     const el=document.getElementById(id);
     el.style.borderColor='rgba(239,68,68,.6)';
-    el.style.animation='shake .3s ease';
-    setTimeout(()=>{ el.style.borderColor=''; el.style.animation=''; },800);
+    setTimeout(()=>{ el.style.borderColor=''; },800);
   }
 
   function deleteEntry(id){
@@ -421,14 +464,15 @@
 
   /* ── RENDER ── */
   function render(){
-    const now   = new Date();
-    const curM  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const thisMonth = entries.filter(e=>e.date && e.date.startsWith(curM));
+    const viewKey = getViewKey();
 
-    const spent   = thisMonth.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
-    const income  = thisMonth.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+    // entries for viewed month: either matches the month OR is recurring
+    const monthEntries = entries.filter(e => e.recurring || (e.date && e.date.startsWith(viewKey)));
+
+    const spent   = monthEntries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+    const income  = monthEntries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
     const balance = income - spent;
-    const biggest = thisMonth.filter(e=>e.type==='expense').sort((a,b)=>b.amount-a.amount)[0];
+    const biggest = monthEntries.filter(e=>e.type==='expense').sort((a,b)=>b.amount-a.amount)[0];
 
     document.getElementById('statSpent').textContent   = fmt(spent);
     document.getElementById('statIncome').textContent  = fmt(income);
@@ -448,18 +492,19 @@
 
     /* Donut + categories */
     const catTotals={};
-    thisMonth.filter(e=>e.type==='expense').forEach(e=>{ catTotals[e.cat]=(catTotals[e.cat]||0)+e.amount; });
+    monthEntries.filter(e=>e.type==='expense').forEach(e=>{ catTotals[e.cat]=(catTotals[e.cat]||0)+e.amount; });
     drawDonut(catTotals,spent);
     drawCatBars(catTotals,spent);
 
     /* Monthly chart */
-    drawMonthlyChart();
+    drawMonthlyChart(viewKey);
 
     /* Entry list */
     const q = document.getElementById('searchInput').value.toLowerCase();
-    let filtered = entries.filter(e=>{
-      if(filterMode==='expense' && e.type!=='expense') return false;
-      if(filterMode==='income'  && e.type!=='income')  return false;
+    let filtered = monthEntries.filter(e=>{
+      if(filterMode==='expense'   && e.type!=='expense')  return false;
+      if(filterMode==='income'    && e.type!=='income')   return false;
+      if(filterMode==='recurring' && !e.recurring)        return false;
       if(q && !e.name.toLowerCase().includes(q) && !e.cat.toLowerCase().includes(q)) return false;
       return true;
     });
@@ -473,11 +518,12 @@
       const isIncome=e.type==='income';
       const d=new Date(e.date+'T00:00:00');
       const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-      return `<div class="expense-item">
+      const recBadge=e.recurring?`<span class="rec-badge">🔁 Recurring</span>`:'';
+      return `<div class="expense-item${e.recurring?' recurring-item':''}">
         <div class="item-left">
           <div class="item-icon" style="background:${m.bg}">${m.icon}</div>
           <div>
-            <div class="item-name">${e.name}</div>
+            <div class="item-name">${e.name} ${recBadge}</div>
             <div class="item-meta">${e.cat} · ${dateStr}</div>
           </div>
         </div>
@@ -528,20 +574,24 @@
   }
 
   /* ── MONTHLY CHART ── */
-  function drawMonthlyChart(){
+  function drawMonthlyChart(viewKey){
     const months=[]; const now=new Date();
     for(let i=5;i>=0;i--){
       const d=new Date(now.getFullYear(),now.getMonth()-i,1);
       months.push({ key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label:d.toLocaleDateString('en-US',{month:'short'}) });
     }
-    const totals=months.map(m=>entries.filter(e=>e.type==='expense'&&e.date&&e.date.startsWith(m.key)).reduce((s,e)=>s+e.amount,0));
-    const max=Math.max(...totals,1);
     const curKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const totals=months.map(m=>{
+      // for monthly chart, include recurring for every month
+      const monthEs = entries.filter(e => e.type==='expense' && (e.recurring || (e.date && e.date.startsWith(m.key))));
+      return monthEs.reduce((s,e)=>s+e.amount,0);
+    });
+    const max=Math.max(...totals,1);
     document.getElementById('monthlyBars').innerHTML=months.map((m,i)=>`
       <div class="month-col">
         <div class="month-amt">${totals[i]>0?'PKR '+(totals[i]/1000).toFixed(1)+'k':''}</div>
         <div class="month-bar-wrap">
-          <div class="month-bar${m.key===curKey?' current':''}" style="height:${Math.max((totals[i]/max)*100,3)}%"></div>
+          <div class="month-bar${m.key===curKey?' current':m.key===viewKey?' viewing':''}" style="height:${Math.max((totals[i]/max)*100,3)}%"></div>
         </div>
         <div class="month-label">${m.label}</div>
       </div>`).join('');
@@ -556,16 +606,43 @@
   /* ── EXPORT CSV ── */
   function exportCSV(){
     if(!entries.length){ showToast('No data to export'); return; }
-    const rows=[['Date','Description','Category','Type','Amount (PKR)'],...entries.map(e=>[e.date,e.name,e.cat,e.type,e.amount])];
-    const csv=rows.map(r=>r.join(',')).join('\n');
+    const rows=[['Date','Description','Category','Type','Amount (PKR)','Recurring'],
+      ...entries.map(e=>[e.date,e.name,e.cat,e.type,e.amount,e.recurring?'Yes':'No'])];
+    const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
     const a=document.createElement('a'); a.href='data:text/csv,'+encodeURIComponent(csv); a.download='spendtrack.csv'; a.click();
     showToast('📥 CSV Downloaded!');
+  }
+
+  /* ── IMPORT CSV ── */
+  function importCSV(event){
+    const file=event.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const lines=e.target.result.split('\n').slice(1); // skip header
+      let imported=0;
+      lines.forEach(line=>{
+        if(!line.trim()) return;
+        // handle quoted CSV values
+        const cols=line.split(',').map(v=>v.replace(/^"|"$/g,'').trim());
+        const [date,name,cat,type,amtStr,recStr]=cols;
+        const amount=parseFloat(amtStr);
+        if(!name||!amount||amount<=0) return;
+        const recurring=recStr&&recStr.toLowerCase()==='yes';
+        const validCat=CAT[cat]?cat:'Other';
+        const validType=(type==='income'||type==='expense')?type:'expense';
+        entries.unshift({id:Date.now()+imported,name:name||'Imported',amount,cat:validCat,type:validType,date:date||today.toISOString().split('T')[0],recurring});
+        imported++;
+      });
+      save(); render();
+      showToast(`✅ Imported ${imported} entr${imported===1?'y':'ies'}`);
+    };
+    reader.readAsText(file);
+    event.target.value='';
   }
 
   /* ── TOAST ── */
   function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 
-  /* ── KEYBOARD SHORTCUT ── */
   document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.activeElement.id!=='searchInput') addEntry(); });
 </script>
 </body>
