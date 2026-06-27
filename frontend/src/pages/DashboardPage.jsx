@@ -45,6 +45,7 @@ export default function DashboardPage() {
   const [formDate, setFormDate]       = useState(today.toISOString().split('T')[0]);
   const [recurring, setRecurring]     = useState(false);
 
+  const [showHelp, setShowHelp]           = useState(false);
   const [editEntry, setEditEntry]         = useState(null);
   const [editName, setEditName]           = useState('');
   const [editAmt, setEditAmt]             = useState('');
@@ -290,6 +291,64 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* HELP MODAL */}
+      {showHelp && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.72)',zIndex:900,display:'flex',alignItems:'center',justifyContent:'center',padding:'16px'}} onClick={e=>e.target===e.currentTarget&&setShowHelp(false)}>
+          <div style={{background:'rgba(13,20,38,.98)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'22px',padding:'28px',width:'100%',maxWidth:'500px',backdropFilter:'blur(24px)',maxHeight:'90vh',overflowY:'auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
+              <div style={{fontSize:'16px',fontWeight:'800',color:'#f1f5f9'}}>📖 How to use SpendTrack</div>
+              <button onClick={()=>setShowHelp(false)} style={{background:'rgba(30,41,59,.8)',border:'1px solid rgba(255,255,255,.07)',color:'#94a3b8',width:'28px',height:'28px',borderRadius:'7px',cursor:'pointer',fontSize:'14px'}}>✕</button>
+            </div>
+            {[
+              {
+                step:'1', icon:'💸', title:'Add an Expense or Income',
+                desc:'Use the form on the left. Choose Expense or Income, fill in a description, amount, pick a category, select a date, then click Add Entry.',
+              },
+              {
+                step:'2', icon:'🔁', title:'Set Recurring Transactions',
+                desc:'Tick the Recurring checkbox for fixed monthly costs like rent, internet, or salary. They will automatically appear in every month\'s view.',
+              },
+              {
+                step:'3', icon:'📅', title:'Navigate Between Months',
+                desc:'Use the ‹ › arrows next to the month name at the top to browse past months. Your recurring entries always show up across all months.',
+              },
+              {
+                step:'4', icon:'✏️', title:'Edit a Transaction',
+                desc:'Click the pencil ✏ button on any transaction row to open the edit form. Change any field and click Save Changes.',
+              },
+              {
+                step:'5', icon:'🎯', title:'Set Category Budgets',
+                desc:'Go to the Cat. Budgets tab in the transactions panel. Type a limit next to any category (e.g. Food = 10,000). The bar turns red if you go over.',
+              },
+              {
+                step:'6', icon:'💡', title:'View Spending Insights',
+                desc:'Go to the Insights tab to compare this month vs last month. See which categories increased or decreased and by how much.',
+              },
+              {
+                step:'7', icon:'📂', title:'Import / Export CSV',
+                desc:'Click Import to upload a CSV file (Date, Description, Category, Type, Amount, Recurring). Click Export to download all your transactions as a spreadsheet.',
+              },
+              {
+                step:'8', icon:'✏', title:'Edit your Monthly Budget',
+                desc:'Click the ✏ Edit link next to Monthly Budget at the top of the page to set your total spending limit for the month.',
+              },
+            ].map(s=>(
+              <div key={s.step} style={{display:'flex',gap:'13px',marginBottom:'16px',alignItems:'flex-start'}}>
+                <div style={{width:'32px',height:'32px',borderRadius:'9px',background:'linear-gradient(135deg,#3b82f6,#8b5cf6)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',flexShrink:0}}>{s.icon}</div>
+                <div>
+                  <div style={{fontSize:'13px',fontWeight:'700',color:'#f1f5f9',marginBottom:'3px'}}>{s.title}</div>
+                  <div style={{fontSize:'12px',color:'#64748b',lineHeight:'1.6'}}>{s.desc}</div>
+                </div>
+              </div>
+            ))}
+            <div style={{marginTop:'20px',padding:'14px',background:'rgba(59,130,246,.08)',border:'1px solid rgba(59,130,246,.2)',borderRadius:'12px'}}>
+              <div style={{fontSize:'11px',color:'#93c5fd',fontWeight:'700',marginBottom:'4px'}}>💡 Quick tip</div>
+              <div style={{fontSize:'12px',color:'#64748b',lineHeight:'1.6'}}>All data is saved to your account automatically. Log in from any device and your transactions will be there.</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{maxWidth:'1180px',margin:'0 auto',position:'relative',zIndex:1}}>
         {/* TOPBAR */}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'22px',flexWrap:'wrap',gap:'12px'}}>
@@ -306,6 +365,7 @@ export default function DashboardPage() {
             <input ref={fileRef} type="file" accept=".csv" style={{display:'none'}} onChange={importCSV}/>
             <button style={ghostBtn} onClick={()=>fileRef.current.click()}>📂 Import</button>
             <button style={ghostBtn} onClick={exportCSV}>⬇ Export</button>
+            <button style={ghostBtn} onClick={()=>setShowHelp(true)} title="How to use">? Help</button>
             <button style={primaryBtn} onClick={()=>document.getElementById('expName').focus()}>+ Add</button>
           </div>
         </div>
@@ -471,8 +531,36 @@ export default function DashboardPage() {
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:'6px',maxHeight:'420px',overflowY:'auto',paddingRight:'2px'}}>
                     {!filtered.length?(
-                      <div style={{textAlign:'center',padding:'36px',color:'#64748b',fontSize:'13px'}}>
-                        <div style={{fontSize:'32px',marginBottom:'10px'}}>📭</div>No transactions found.
+                      <div style={{textAlign:'center',padding:'32px 16px',color:'#64748b'}}>
+                        {entries.length===0?(
+                          <>
+                            <div style={{fontSize:'36px',marginBottom:'12px'}}>👋</div>
+                            <div style={{fontSize:'14px',fontWeight:'700',color:'#94a3b8',marginBottom:'8px'}}>No transactions yet</div>
+                            <div style={{fontSize:'12px',lineHeight:'1.7',marginBottom:'18px'}}>
+                              Start by adding your first expense or income<br/>using the form on the left.
+                            </div>
+                            <div style={{display:'flex',flexDirection:'column',gap:'8px',textAlign:'left',background:'rgba(30,41,59,.5)',borderRadius:'12px',padding:'14px'}}>
+                              {[
+                                ['💸','Choose Expense or Income'],
+                                ['📝','Enter a description & amount'],
+                                ['🏷️','Pick a category'],
+                                ['✅','Click Add Entry'],
+                              ].map(([icon,text])=>(
+                                <div key={text} style={{display:'flex',alignItems:'center',gap:'9px',fontSize:'12px',color:'#94a3b8'}}>
+                                  <span style={{fontSize:'15px'}}>{icon}</span>{text}
+                                </div>
+                              ))}
+                            </div>
+                            <button onClick={()=>setShowHelp(true)} style={{marginTop:'14px',background:'none',border:'1px solid rgba(59,130,246,.3)',color:'#3b82f6',fontSize:'12px',fontWeight:'600',padding:'7px 16px',borderRadius:'8px',cursor:'pointer'}}>
+                              📖 View full guide
+                            </button>
+                          </>
+                        ):(
+                          <>
+                            <div style={{fontSize:'32px',marginBottom:'10px'}}>🔍</div>
+                            <div style={{fontSize:'13px'}}>No transactions match your filter.</div>
+                          </>
+                        )}
                       </div>
                     ):filtered.map(e=>{
                       const m=CAT[e.category]||CAT.Other;
